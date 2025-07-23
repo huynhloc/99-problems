@@ -102,16 +102,23 @@ const CurrencySwapForm = () => {
   const isInputChangedByUser = useRef(true);
   
   const [rates, setRates] = useState([]);
-  const [fromCurrency, setFromCurrency] = useState('USD');
-  const [toCurrency, setToCurrency] = useState('EUR');
+  const [fromCurrency, setFromCurrency] = useState('');
+  const [toCurrency, setToCurrency] = useState('');
   const [fromAmount, setFromAmount] = useState('');
   const [toAmount, setToAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [lastEdited, setLastEdited] = useState('from');
+  const [error, setError] = useState('');
 
   const fetchExchangeRates = () => {
+    setError('');
     return fetch('https://interview.switcheo.com/prices.json')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`fetchExchangeRates error status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
         const deduped = data.reduce((acc, curr) => {
           const existing = acc.find(item => item.currency === curr.currency);
@@ -127,7 +134,8 @@ const CurrencySwapForm = () => {
         if (deduped.length > 1) setToCurrency(deduped[1].currency);
       })
       .catch(e => {
-        console.log(e);
+        console.error('Error fetching exchange rates:', e);
+        setError('Failed to load exchange rates. Please reload page or contact customer service.');
       })
   }
 
@@ -232,79 +240,104 @@ const CurrencySwapForm = () => {
     }
   }
 
+  const handleDismissError = () => {
+    setError('');
+  }
+
   return (
     <div className="currency-swap-form">
       <div className="form-container">
-        <div className="currency-input-group">
-          <label className="input-label">Amount to send</label>
-          <div className="currency-input">
-            <div className="input-container">
-              <input
-                id="fromAmount"
-                type="text"
-                value={fromAmount}
-                onChange={handleFromAmountChange}
-                placeholder="0.00"
-                className="amount-input"
-              />
-              {isLoading && lastEdited === 'to' && (
-                <div className="loading-spinner"></div>
-              )}
+        {error && (
+          <div className="error-alert">
+            <div className="error-content">
+              <svg className="error-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path 
+                  fillRule="evenodd" 
+                  clipRule="evenodd" 
+                  d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 14V16H9V14H11ZM11 4V12H9V4H11Z" 
+                  fill="currentColor"
+                />
+              </svg>
+              <span className="error-message">{error}</span>
             </div>
-            <CurrencyDropdown
-              value={fromCurrency}
-              onChange={e => {
-                console.log(e);
-                isInputChangedByUser.current = true;
-                setFromCurrency(e);
-              }}
-              rates={rates}
-              className="currency-select"
-            />
+            <div className="error-actions">
+              <button onClick={handleDismissError} className="dismiss-button">
+                ×
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div className="swap-button-container">
-          <button
-            id="swapButton"
-            onClick={handleSwapCurrencies}
-            className="swap-button"
-            aria-label="Swap currencies"
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 7V3L4 7L8 11V7H16V9H8V7Z" fill="currentColor" />
-              <path d="M16 17V21L20 17L16 13V17H8V15H16V17Z" fill="currentColor" />
-            </svg>
-          </button>
-        </div>
+        )}
 
         <div className="currency-input-group">
-          <label className="input-label">Amount to receive</label>
-          <div className="currency-input">
-            <div className="input-container">
-              <input
-                id="toAmount"
-                type="text"
-                value={toAmount}
-                onChange={handleToAmountChange}
-                placeholder="0.00"
-                className="amount-input"
+            <label className="input-label">Amount to send</label>
+            <div className="currency-input">
+              <div className="input-container">
+                <input
+                  id="fromAmount"
+                  type="text"
+                  value={fromAmount}
+                  onChange={handleFromAmountChange}
+                  placeholder="0.00"
+                  className="amount-input"
+                />
+                {isLoading && lastEdited === 'to' && (
+                  <div className="loading-spinner"></div>
+                )}
+              </div>
+              <CurrencyDropdown
+                value={fromCurrency}
+                onChange={e => {
+                  console.log(e);
+                  isInputChangedByUser.current = true;
+                  setFromCurrency(e);
+                }}
+                rates={rates}
+                className="currency-select"
               />
-              {isLoading && lastEdited === 'from' && (
-                <div className="loading-spinner"></div>
-              )}
             </div>
-            <CurrencyDropdown
-              value={toCurrency}
-              onChange={e => {
-                isInputChangedByUser.current = true;
-                setToCurrency(e);
-              }}
-              rates={rates}
-              className="currency-select"
-            />
           </div>
-        </div>
+
+          <div className="swap-button-container">
+            <button
+              id="swapButton"
+              onClick={handleSwapCurrencies}
+              className="swap-button"
+              aria-label="Swap currencies"
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 7V3L4 7L8 11V7H16V9H8V7Z" fill="currentColor" />
+                <path d="M16 17V21L20 17L16 13V17H8V15H16V17Z" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="currency-input-group">
+            <label className="input-label">Amount to receive</label>
+            <div className="currency-input">
+              <div className="input-container">
+                <input
+                  id="toAmount"
+                  type="text"
+                  value={toAmount}
+                  onChange={handleToAmountChange}
+                  placeholder="0.00"
+                  className="amount-input"
+                />
+                {isLoading && lastEdited === 'from' && (
+                  <div className="loading-spinner"></div>
+                )}
+              </div>
+              <CurrencyDropdown
+                value={toCurrency}
+                onChange={e => {
+                  isInputChangedByUser.current = true;
+                  setToCurrency(e);
+                }}
+                rates={rates}
+                className="currency-select"
+              />
+            </div>
+          </div>
       </div>
     </div>
   )

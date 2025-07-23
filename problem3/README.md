@@ -61,7 +61,7 @@ if (leftPriority > rightPriority) {
 ```
 <br>
 
-- looping `sortedBalances` twice to compute `formattedBalances` and `rows` but `formattedBalances` is not used anywhere, 
+- looping `sortedBalances` twice to compute `formattedBalances` and `rows` but `formattedBalances` is not used anywhere.
 <br>
 
 

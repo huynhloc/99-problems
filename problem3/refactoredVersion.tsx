@@ -61,10 +61,9 @@ const WalletPage: React.FC<Props> = (props: Props) => {
         amount={balance.amount}
         usdValue={balance.usdValue}
         formattedAmount={balance.formatted}
-        currency={balance.currency} // Added currency prop if needed
       />
     ));
-  }, [formattedBalances]);
+  }, [formattedBalances]); // useMemo to avoid re-calculating on every render 
 
   return (
     <div {...rest}>

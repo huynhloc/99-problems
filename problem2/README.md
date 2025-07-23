@@ -1,6 +1,6 @@
 ### Vite + Reactjs
 
-*Run flow commands in order to start*
+**Run commands in order to start**
 
 `yarn install`
 

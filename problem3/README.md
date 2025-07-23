@@ -1,6 +1,6 @@
 **There are several computational inefficiencies and anti-patterns:**
 
-- `FormattedWalletBalance` inteface shoule extend `WalletBalance` interface
+- `FormattedWalletBalance` interface should extend from `WalletBalance` interface
 
 - `children` is not used anywhere, and shoule be removed
 

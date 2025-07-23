@@ -2,7 +2,7 @@
 
 - `FormattedWalletBalance` interface should extend from `WalletBalance` interface
 
-- `children` is not used anywhere, and shoule be removed
+- `children` is not used anywhere, and should be removed
 
 - missing `blockchain` property in `WalletBalance` interface
 ```

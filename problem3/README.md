@@ -1,4 +1,4 @@
-*There are several computational inefficiencies and anti-patterns:*
+**There are several computational inefficiencies and anti-patterns:**
 
 - `FormattedWalletBalance` inteface shoule extend `WalletBalance` interface
 
